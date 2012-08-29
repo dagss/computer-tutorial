@@ -11,7 +11,7 @@ void format_binary(void *p, char *out, int nbytes) {
   char *data = p;
   for (int ibyte = 0; ibyte != nbytes; ibyte++) {
     for (int ibit = 7; ibit != -1; ibit--) {
-      if ((data[ibyte] >> ibit) & 1 == 1) {
+      if (((data[ibyte] >> ibit) & 1) == 1) {
         out[iout++] = '1';
       } else {
         out[iout++] = '0';
