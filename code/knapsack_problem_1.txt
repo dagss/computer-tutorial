@@ -1,0 +1,7 @@
+15
+5
+mirror 4 12
+dagger 2 1
+candle 2 2
+cloak 1 1
+ring 10 4
