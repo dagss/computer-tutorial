@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+    echo "Usage: setcpuscaling performance|ondemand|..."
+    echo
+    echo "The argument is written to "
+    echo "/sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_governor"
+    exit 1
+fi
+
+[ "$UID" != 0 ] && exec sudo $0 $*
+
+for i in /sys/devices/system/cpu/cpu[0-9]*; do
+    echo $1 > $i/cpufreq/scaling_governor || exit 1
+done
