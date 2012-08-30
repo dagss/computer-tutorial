@@ -1,5 +1,10 @@
 *~
 *.o
+*.pyc
+*.pyo
+*.so
+*_wrapper.c
+*.el
 
 code/binary
 code/knapsack
