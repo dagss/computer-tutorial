@@ -9,7 +9,7 @@ from memory_benchmarks_wrapper import benchmark_bandwidth, get_num_threads
 
 ks = np.arange(8, 28)
 sizes = 2**ks
-nrepeats = 2**(ks[-1] + 1 - ks)
+nrepeats = 2**(ks[-1] + 3 - ks)
 times = np.zeros(len(ks), dtype=np.float64)
 
 fig, ax = plt.subplots(1, 1)

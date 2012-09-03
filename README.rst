@@ -7,3 +7,7 @@ http://www.mn.uio.no/astro/forskning/aktuelt/arrangementer/gjesteforelesninger-s
 
 Please see the ``code`` directory for demonstration code used during
 the tutorial.
+
+Useful commands
+
+ * Show cache sizes: ``sudo dmidecode -t cache``

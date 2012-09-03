@@ -5,6 +5,7 @@
 *.so
 *_wrapper.c
 *.el
+*.s
 
 code/binary
 code/knapsack
