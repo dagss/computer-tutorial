@@ -17,7 +17,6 @@ knapsack: knapsack.c
 
 memory_benchmarks: memory_benchmarks.c memory_benchmarks_wrapper.pyx
 	gcc $(CFLAGS) -O3 -c -o memory_benchmarks.o memory_benchmarks.c
-	objdump -M intel -S memory_benchmarks.o > memory_benchmarks.s
 	cython memory_benchmarks_wrapper.pyx
 	gcc $(PYCFLAGS) $(PYINCLUDES) -c -o memory_benchmarks_wrapper.o \
 	  memory_benchmarks_wrapper.c

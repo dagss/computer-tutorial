@@ -11,3 +11,5 @@ the tutorial.
 Useful commands
 
  * Show cache sizes: ``sudo dmidecode -t cache``
+
+ * Show assembly code: ``objdump -M intel -S yourfile.o``
