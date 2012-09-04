@@ -6,6 +6,7 @@
 *_wrapper.c
 *.el
 *.s
+*.mod
 
 code/binary
 code/knapsack
