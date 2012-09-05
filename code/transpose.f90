@@ -18,7 +18,7 @@ contains
     integer :: n, itile, jtile, i, j
 
     ! Note: This obviously fails if n does not divide tilesize;
-    ! fixing this up is left as an exersize to the reader...
+    ! fixing this up is left as an exercise to the reader...
     do jtile = 0, n / t - 1
        do itile = 0, n / t - 1
           do j = 1, t
@@ -39,11 +39,13 @@ program transpose_runner
   use omp_lib
   implicit none
 
-  integer, parameter :: n = 8192
+  integer, parameter :: n = 8192, nrepeat = 5
   real(8) :: t0, dt_naive, dt_tiled
+  real(8), dimension(nrepeat) :: timings
   real(8), dimension(:, :), allocatable :: input, output
-  integer :: i, j
+  integer :: i, j, r
 
+  !$omp parallel default(private)
   allocate(input(n, n))
   allocate(output(n, n))
 
@@ -53,42 +55,60 @@ program transpose_runner
      end do
   end do
 
-  write (*,*)
-  write (*,*) "First two columns of input:"
-  do j = 1, 10
-     write (*,"(F10.0,F10.0)") input(j, 1), input(j, 2)
-  end do
-  write (*,*) "..."
-  do j = n - 10, n
-     write (*,"(F10.0,F10.0)") input(j, 1), input(j, 2)
-  end do
+  if (omp_get_thread_num() == 0) then
+     write (*,*)
+     write (*,*) "First two columns of input:"
+     do j = 1, 10
+        write (*,"(F10.0,F10.0)") input(j, 1), input(j, 2)
+     end do
+     write (*,*) "..."
+     do j = n - 10, n
+        write (*,"(F10.0,F10.0)") input(j, 1), input(j, 2)
+     end do
 
-  write (*,*)
+     write (*,*)
+  end if
 
-! Call transpose_naive
+  ! Benchmark transpose_naive
+  do r = 1, nrepeat
+     !$omp barrier
+     t0 = omp_get_wtime()
+     call transpose_naive(input, output, n)
+     !$omp barrier
+     timings(r) = omp_get_wtime() - t0
+  end do
+  dt_naive = minval(timings)
+  if (omp_get_thread_num() == 0) then
+     write (*,'(A,ES14.3)') "transpose_naive running time: ", dt_naive
+  end if
+
+  ! Benchmark transpose_tiled
   t0 = omp_get_wtime()
-  call transpose_naive(input, output, n)
-  dt_naive = omp_get_wtime() - t0
-  write (*,'(A,ES14.3)') "transpose_naive running time: ", dt_naive
-
-! Call transpose_tiled
-  t0 = omp_get_wtime()
-  call transpose_tiled(input, output, n)
-  dt_tiled = omp_get_wtime() - t0
-  write (*,'(A,ES14.3)') "transpose_tiled running time: ", dt_tiled
-  write (*,*) "speedup", dt_naive / dt_tiled
-
-  write (*,*)
-  write (*,*) "First two colums of output:"
-  do j = 1, 10
-     write (*,"(F10.0,F10.0)") output(j, 1), output(j, 2)
+  do r = 1, nrepeat
+     !$omp barrier
+     t0 = omp_get_wtime()
+     call transpose_tiled(input, output, n)
+     !$omp barrier
+     timings(r) = omp_get_wtime() - t0
   end do
-  write (*,*) "..."
-  do j = n - 10, n
-     write (*,"(F10.0,F10.0)") output(j, 1), output(j, 2)
-  end do
+  dt_tiled = minval(timings)
+  
+  if (omp_get_thread_num() == 0) then
+     write (*,'(A,ES14.3)') "transpose_tiled running time: ", dt_tiled
+     write (*,*) "speedup", dt_naive / dt_tiled
 
+     write (*,*)
+     write (*,*) "First two colums of output:"
+     do j = 1, 10
+        write (*,"(F10.0,F10.0)") output(j, 1), output(j, 2)
+     end do
+     write (*,*) "..."
+     do j = n - 10, n
+        write (*,"(F10.0,F10.0)") output(j, 1), output(j, 2)
+     end do
+  end if
   deallocate(input)
   deallocate(output)
+  !$omp end parallel
 
 end program transpose_runner
