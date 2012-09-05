@@ -12,3 +12,12 @@ code/binary
 code/knapsack
 code/transpose
 code/arithmetic
+code/add
+
+*.aux
+*.toc
+*.log
+*.nav
+*.out
+*.snm
+slides_src/computers-tutorial.pdf

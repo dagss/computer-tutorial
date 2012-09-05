@@ -1,0 +1,10 @@
+
+
+- Virtual memory
+-- Each process it's own 64-bit (18 quintillion) address space
+-- Pages may be shared between processes
+--- Automatic (read-only, copy-on-write)
+--- File system cache
+--- Process shared memory with `shmem` and `mmap`
+
+
