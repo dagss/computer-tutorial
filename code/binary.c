@@ -30,19 +30,25 @@ void print_double(double x) {
 }
 
 int main() {
-  /* Print all the 1-byte numbers */
+  printf("All 8-bit values:\n");
   for (uint8_t i = 0; ; ++i) {
     char buf[9];
     format_binary(&i, buf, 1);
-    /* Print representations: unsigned, signed, hex, binary */
-    printf("%4d    %4d    0x%02x    %s\n", i, (int8_t)i, i, buf);
+    /* Print representations: unsigned, signed, hex, ASCII character, binary */
+    char i_or_space;
+    if (i >= 32 && i < 127) {
+      i_or_space = i;
+    } else {
+      i_or_space = ' ';
+    }
+    printf("%4d    %4d    0x%02x   %c    %s\n", i, (int8_t)i, i, i_or_space, buf);
 
     /* cannot break the usual way due to overflow, so do it before the ++i */
     if (i == 255) break; 
   }
   printf("\n");
   
-  /* Print a few 2-byte numbers */
+  printf("Some 16-bit values:\n");
   for (uint16_t i = 250; i != 265; ++i) {
     char buf[2 * 9];
     format_binary(&i, buf, 2);
@@ -56,6 +62,7 @@ int main() {
   http://en.wikipedia.org/wiki/Double-precision_floating-point_format
 
   and keep in mind big vs. little-endian. */
+  printf("Double-precision floating point (64 bits = 8 bytes):\n");
   print_double(1.0);
   print_double(-1);
   print_double(2.0);
@@ -67,6 +74,7 @@ int main() {
 
   /* Print a pointer */
   double x = 2.71828182846;
+  printf("Finally, a pointer:\n");
   printf(" x contains %f and its address is 0x%016lx\n", x, (uintptr_t)&x);
   printf("\n");
   

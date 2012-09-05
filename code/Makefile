@@ -9,14 +9,21 @@ PYLIBS=$(shell python-config --libs)
 NUMPY_INCLUDE=-I$(shell python -c 'import numpy; print(numpy.get_include())')
 PYINCLUDES=$(NUMPY_INCLUDE) $(shell python-config --includes)
 
-binary: binary.c
-	gcc $(CFLAGS) -o binary binary.c
+add: add.c Makefile
+	gcc -Wall -O0 -g -c -o add.o add.c
+	gcc -o add add.o
 
-knapsack: knapsack.c
-	gcc $(CFLAGS) -o knapsack knapsack.c
+binary: binary.c
+	gcc -Wall -g -O0 -c -o binary.o binary.c
+	gcc -o binary binary.o
+
+knapsack: knapsack.c Makefile
+	gcc -Wall -g -O0 -std=c99 -c -o knapsack.o knapsack.c
+	gcc -o knapsack knapsack.o
 
 memory_benchmarks: memory_benchmarks.c memory_benchmarks_wrapper.pyx
-	gcc $(CFLAGS) -O3 -c -o memory_benchmarks.o memory_benchmarks.c
+	gcc -g -std=c99 -Wall -fPIC -fopenmp -mtune=native -O3 \
+          -c -o memory_benchmarks.o memory_benchmarks.c
 	cython memory_benchmarks_wrapper.pyx
 	gcc $(PYCFLAGS) $(PYINCLUDES) -c -o memory_benchmarks_wrapper.o \
 	  memory_benchmarks_wrapper.c

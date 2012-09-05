@@ -36,3 +36,9 @@ Cache size:
 
 Show assembly code:
     ``objdump -M intel -S yourfile.o``
+
+Resources
+---------
+
+Documentation on low-level optimization:
+    http://agner.org/optimize/
