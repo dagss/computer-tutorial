@@ -105,11 +105,11 @@
 
 \begin{frame}{Pointers (as seen in C)}
   \begin{tabular}{lll}
-    \uncover<+->{{\tt int32\_t x;} & \quad\quad Declare a 4-byte integer ``x'' \\}
-    \uncover<+->{{\tt x = 42;} & \quad\quad Memory of ``x'' now contains 42 \\}
-    \uncover<+->{{\tt int32\_t *p;} & \quad\quad Declare an 8-byte {\bf pointer to int} ``p'' \\}
-    \uncover<+->{{\tt p = \&x;} & \quad\quad Memory of ``p'' now contains 0x00007fffa63cc4b0 \\}
-    \uncover<+->{{\tt *p = 10;} & \quad\quad Memory of ``x'' now contains 10 \\}
+    \uncover<+->{{\tt int32\_t x;} & \quad Declare a 4-byte integer ``x'' \\}
+    \uncover<+->{{\tt x = 42;} & \quad Memory of ``x'' now contains 42 \\}
+    \uncover<+->{{\tt int32\_t *p;} & \quad Declare an 8-byte {\bf pointer to int} ``p'' \\}
+    \uncover<+->{{\tt p = \&x;} & \quad Memory of ``p'' now contains 0x00007fffa63cc4b0 \\}
+    \uncover<+->{{\tt *p = 10;} & \quad Memory of ``x'' now contains 10}
   \end{tabular}
 \end{frame}
 
@@ -297,7 +297,6 @@ Experiments exploring memory bus, cache, cache lines:
 \item<+-> Memory bandwidth
 \item<+-> Memory latency
 \item<+-> Matrix transpose
-\item<+-> OpenMP cache-line ping-pong
 \end{enumerate}
 \end{frame}
 
@@ -307,7 +306,190 @@ Experiments exploring memory bus, cache, cache lines:
 
 \begin{frame}
   \begin{center}
+    {\Large Parallel computing}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Multi-core false dependencies (cache line ping pong)}
+\uncover<+->{Experiment: {\tt pingpong.c}}
+\end{frame}
+
+% \begin{frame}[fragile]{Non-Uniform Memory Architecture}
+% \footnotesize
+% \only<1>{
+% \begin{verbatim}
+% Number of nodes: 8
+% Memory mask: 0 1 2 3 4 5 6 7 
+% Run mask: 0 1 2 3 4 5 6 7 
+% #0: Mem: 23.6 GB (22.2 GB free), CPUs: 0 4 8 12 16 20 
+% #1: Mem: 23.7 GB (23.5 GB free), CPUs: 24 28 32 36 40 44 
+% #2: Mem: 23.7 GB (23.6 GB free), CPUs: 3 7 11 15 19 23 
+% #3: Mem: 23.7 GB (20.8 GB free), CPUs: 27 31 35 39 43 47 
+% #4: Mem: 23.7 GB (23.2 GB free), CPUs: 2 6 10 14 18 22 
+% #5: Mem: 23.7 GB (23.6 GB free), CPUs: 26 30 34 38 42 46 
+% #6: Mem: 23.7 GB (22.2 GB free), CPUs: 1 5 9 13 17 21 
+% #7: Mem: 23.7 GB (23.3 GB free), CPUs: 25 29 33 37 41 45 
+% \end{verbatim}
+% }
+% \only<2>{fp}
+% \end{frame}
+
+
+\begin{frame}{Competing programming models}
+\uncover<+->{
+  \begin{itemize}
+  \item<+-> MPI: Explicit sharing through message passing (harder, safer)
+  \item<+-> OpenMP: Implicit sharing through shared memory (easier, less safe)
+  \end{itemize}
+}
+
+~
+
+\uncover<+->{
+Example: NERSC Hopper cluster
+\begin{itemize}
+\item 6384 nodes
+\item 24 cores per node
+\item 32 GB memory per node $\rightarrow$ 1.33 GB per core
+\end{itemize}
+}
+
+\uncover<+->{
+May be better to write 24-threaded program with 32 GB
+memory than 1-threaded program with 1.33 GB memory...BUT!
+}
+
+~
+
+%\uncover<+->{
+%\Large \color{red} If it wasn't for NUMA!!
+%}
+\end{frame}
+
+\begin{frame}[fragile]{Non-Uniform Memory Architecture}
+\footnotesize
+\begin{verbatim}
+dagss@owl3 $ numactl --hardware
+available: 8 nodes (0-7)
+node 0 size: 24216 MB
+node 0 free: 22685 MB
+node 1 size: 24240 MB
+node 1 free: 24111 MB
+node 2 size: 24240 MB
+node 2 free: 24158 MB
+<...>
+node distances:
+node   0   1   2   3   4   5   6   7 
+  0:  10  16  16  22  16  22  16  22 
+  1:  16  10  16  22  22  16  22  16 
+  2:  16  16  10  16  16  16  16  22 
+  3:  22  22  16  10  16  16  22  16 
+  4:  16  22  16  16  10  16  16  16 
+  5:  22  16  16  16  16  10  22  22 
+  6:  16  22  16  22  16  22  10  16 
+  7:  22  16  22  16  16  22  16  10 
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Non-Uniform Memory Architecture: AMD}
+\footnotesize
+\begin{verbatim}
+dagss@owl3 $ bin/numabench 6 
+== Write (6 threads per node, GiB/s) ==
+   5.9     4.9     2.2     1.8     2.1     1.8     4.0     3.6  
+   4.9     5.9     2.1     1.8     1.8     2.0     1.9     2.2  
+   2.1     2.2     5.9     4.9     2.2     2.2     2.0     1.8  
+   2.1     2.1     4.9     5.9     4.0     4.0     1.8     2.1  
+   3.7     3.6     2.2     3.9     5.9     4.9     2.2     3.9  
+   3.5     3.7     2.2     2.2     4.8     6.0     2.1     3.8  
+   2.2     1.9     3.7     3.5     2.2     1.8     5.9     4.9  
+   1.8     2.2     1.8     2.1     2.1     1.8     4.9     5.9  
+== Read (6 threads per node, GiB/s) ==
+  11.1     4.7     2.1     2.0     2.4     2.5     2.1     1.8  
+   4.7    11.2     2.1     2.1     2.5     2.4     1.8     2.1  
+   2.1     2.1    11.2     4.8     2.1     2.2     2.4     1.7  
+   1.8     1.8     4.8    11.1     4.1     2.1     2.5     2.0  
+   1.9     1.8     2.1     4.1    11.2     4.4     2.1     2.1  
+   1.8     1.9     2.2     2.7     3.2    11.2     1.8     1.8  
+   2.6     1.8     1.9     1.7     2.1     2.1    11.1     4.4  
+   2.5     2.1     1.7     2.0     2.6     2.3     4.7    11.1  
+\end{verbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]{Non-Uniform Memory Architecture: Intel}
+\footnotesize
+\begin{verbatim}
+dagss@mimosa $ bin/numabench 8 
+== Write (8 threads per node, GiB/s) ==
+  10.1     7.2     5.4     5.1     4.6     5.4     5.3     7.3  
+   7.2    10.2     7.7     5.4     5.6     4.6     5.2     5.4  
+   5.4     7.6    10.0     7.2     5.4     5.2     4.5     5.5  
+   5.1     5.4     7.2    10.0     7.3     5.4     5.4     4.5  
+   4.5     5.4     5.3     7.2    10.0     7.2     5.4     5.1  
+   5.5     4.5     5.2     5.4     7.2    10.0     7.6     5.4  
+   5.3     5.2     4.5     5.5     5.4     7.6    10.0     7.2  
+   7.3     5.3     5.4     4.5     5.1     5.4     7.2    10.0  
+== Read (8 threads per node, GiB/s) ==
+  22.0     7.6     8.2     7.4     7.1     7.8     8.0     8.5  
+   7.7    21.9     8.6     8.2     7.3     7.0     7.5     8.0  
+   8.1     9.0    21.8     7.6     8.0     7.4     7.0     7.4  
+   7.3     8.1     7.6    22.0     9.4     8.0     7.7     6.9  
+   7.0     7.7     7.9     9.2    21.9     7.6     8.2     7.3  
+   7.4     6.9     7.4     7.9     7.6    21.8     8.9     8.2  
+   8.0     7.5     7.0     7.3     8.1     8.6    21.8     7.6  
+   9.0     8.0     7.7     6.9     7.3     8.1     7.6    22.0  
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Hybrid approach!}
+
+NERSC:
+\begin{quote}
+  When using hybrid OpenMP-MPI in applications NERSC strongly suggests
+  running with 4 MPI tasks and 6 OpenMP threads each per node.  Using
+  1 MPI task and 24 OpenMP threads per node is NOT an optimal way to
+  use the Hopper nodes, as it is very hard to address the performance
+  implications of the Non-Uniform Memory Architecture (NUMA) of the
+  Hopper nodes using more than 6 OpenMP threads.
+\end{quote}
+{\small \tt http://1.usa.gov/UuFzYe}
+
+~
+
+{\tt numactl} is your friend!
+\end{frame}
+
+\begin{frame}{Summary and opinions on parallelism}
+\begin{itemize}
+  \item<+-> Sharing memory is convenient but dangerous for performance
+  \item<+-> Does OpenMP make it too easy to share memory?
+  \item<+-> Non-trivial code: Dead-locks, races, ...
+  \item<+-> Alternative 1: Asynchronous message passing with ZeroMQ!
+    \begin{itemize}
+    \item Beautiful programming interface!
+    \item Extremely fast
+    \item In-process, cross-process, cluster, or internet
+    \end{itemize}
+    \includegraphics[width=0.3\textwidth]{zeromq.png}
+  \item<+-> Alternative 2 (experts): Use MPI and explicitly share memory on same
+     node
+     \begin{itemize}
+     \item {\tt man shmem}
+     \item {\tt man mmap}
+     \end{itemize}
+   \item<+-> Alternative $n$: Too many frameworks to even begin...
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \begin{center}
     \LARGE A more complicated picture of CPUs
+
+~
+
+(+ some GPU)
   \end{center}
 \end{frame}
 
@@ -340,19 +522,19 @@ imul   eax, eax
 mov    [rsp+0x4], eax
 \end{verbatim}
 
-will execute more similar to:
+% will execute more similar to:
 
-\begin{verbatim}
-mov    eax0, [rsp]
-mov    eax1, [rsp+0x4]
-imul   eax0, eax0
-imul   eax1, eax1
-mov    [rsp], eax0
-mov    [rsp+0x4], eax1
-\end{verbatim}
+% \begin{verbatim}
+% mov    eax0, [rsp]
+% mov    eax1, [rsp+0x4]
+% imul   eax0, eax0
+% imul   eax1, eax1
+% mov    [rsp], eax0
+% mov    [rsp+0x4], eax1
+% \end{verbatim}
 
     };
-    \node at (4, 0) {
+    \node at (4, -2) {
       \includegraphics[width=0.6\textwidth]{nehalem_arch.pdf}
     };
   \end{tikzpicture}
@@ -415,6 +597,27 @@ if (x < 100) {
 ~
 
 \includegraphics[width=.6\textwidth]{sse.jpg} 
+\end{frame}
+
+
+\begin{frame}{CPUs have become complicated...what about GPUs?}
+\uncover<2>{
+  \begin{itemize}
+  \item Out-of-order execution: {\bf No}
+  \item Register renaming: {\bf No}
+  \item Branch prediction: {\bf No}
+  \item Speculative execution: {\bf No}
+  \item Cache: {\bf Yes, but manual} {\tiny (optional CPU-style cache available recently)}
+  \item Pipelining: {\bf Yes}
+  \item Vector registers: {\bf Sort of...}
+  \end{itemize}
+}
+
+  \includegraphics[width=\textwidth]{nvidiatesla.jpg}
+\end{frame}
+
+\begin{frame}
+  \includegraphics[height=\textheight]{gpu_sm.jpg}
 \end{frame}
 
 \end{document}
