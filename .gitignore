@@ -13,6 +13,7 @@ code/knapsack
 code/transpose
 code/arithmetic
 code/add_and_square
+code/pingpong
 
 *.aux
 *.toc

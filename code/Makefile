@@ -34,6 +34,13 @@ transpose: transpose.f90 Makefile
 arithmetic: arithmetic.f90 Makefile
 	gfortran -fopenmp -Wall -O3 -mtune=native -o arithmetic arithmetic.f90
 
+liblookatme.so:
+	gcc -shared -o liblookatme.so lookatme.c
+
+pingpong: pingpong.c liblookatme.so Makefile
+	gcc -O3 -Wall -std=c99 -g -fopenmp -c -o pingpong.o pingpong.c
+	gcc -fopenmp -o pingpong pingpong.o -Wl,-R. -L. -llookatme
+
 clean:
 	rm -f *.o *.so binary knapsack
 
