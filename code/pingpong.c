@@ -5,8 +5,8 @@
 #include "lookatme.h"
 
 #define CACHELINESIZE 64
-#define N (10 * 1000 * 1000)
-#define NSAMPLES 4
+#define N (50 * 1000 * 1000)
+#define NSAMPLES 30
 
 int main() {
 
@@ -32,6 +32,7 @@ int main() {
       printf("Time taken when sharing cache line: %.2e s\n", t_same_line);
     }
 
+#pragma omp barrier
     double t_multi_line = 1e10;
     for (int r = 0; r != NSAMPLES; ++r) {
       double t0 = omp_get_wtime();
