@@ -35,9 +35,6 @@ sse_transpose: sse_transpose.c Makefile
 	gcc -O3 -g -std=c99 -Wall -mtune=native -fopenmp -c -o sse_transpose.o sse_transpose.c
 	gcc -fopenmp -o sse_transpose sse_transpose.c
 
-arithmetic: arithmetic.f90 Makefile
-	gfortran -fopenmp -Wall -O3 -mtune=native -o arithmetic arithmetic.f90
-
 liblookatme.so: lookatme.c Makefile
 	gcc -shared -fPIC -o liblookatme.so lookatme.c
 
