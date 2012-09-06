@@ -1,17 +1,15 @@
 # Normally I use 'waf' for building. Others use 'cmake'. But for the
 # tutorial I use Make since that's probably familiar to more people.
 
-CFLAGS=-g -std=c99 -Wall -fPIC -fopenmp -mtune=native
-
 PYCFLAGS=$(shell python-config --cflags) -fPIC -fopenmp
 PYLDFLAGS=$(shell python-config --ldflags) -L$(shell python-config --prefix)/lib -fpthread
 PYLIBS=$(shell python-config --libs)
 NUMPY_INCLUDE=-I$(shell python -c 'import numpy; print(numpy.get_include())')
 PYINCLUDES=$(NUMPY_INCLUDE) $(shell python-config --includes)
 
-add: add.c Makefile
-	gcc -Wall -O0 -g -c -o add.o add.c
-	gcc -o add add.o
+add_and_square: add_and_square.c Makefile
+	gcc -Wall -O1 -g -c -o add_and_square.o add_and_square.c
+	gcc -o add_and_square add_and_square.o
 
 binary: binary.c
 	gcc -Wall -g -O0 -c -o binary.o binary.c
