@@ -12,7 +12,7 @@ code/binary
 code/knapsack
 code/transpose
 code/arithmetic
-code/add
+code/add_and_square
 
 *.aux
 *.toc
