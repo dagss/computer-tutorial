@@ -3,15 +3,13 @@ cimport openmp
 from cython cimport parallel
 
 cdef extern:
-    double benchmark_bandwidth_c "benchmark_bandwidth"(double *array, size_t size, int repeats,
-                                                       int nthreads, int pigs_can_fly)
+    double benchmark_bandwidth_c(size_t size, int repeats, int nthreads, int pigs_can_fly)
     
-    double benchmark_latency_c "benchmark_latency"(cnp.uint64_t *indices, size_t n, int repeats,
-                                                   int pigs_can_fly, cnp.uint64_t *result)
+    double benchmark_latency_c(cnp.uint64_t *indices, size_t n, int repeats,
+                               int pigs_can_fly, cnp.uint64_t *result)
 
-def benchmark_bandwidth(cnp.ndarray[double, mode='c'] array, int nthreads,
-                        int repeats):
-    return benchmark_bandwidth_c(&array[0], array.shape[0], repeats, nthreads, 0)
+def benchmark_bandwidth(size_t size, int nthreads, int repeats):
+    return benchmark_bandwidth_c(size, repeats, nthreads, 0)
                              
 def benchmark_latency(cnp.ndarray[cnp.uint64_t, mode='c'] indices, int repeats):
     cdef cnp.uint64_t out

@@ -17,8 +17,7 @@ fig, ax = plt.subplots(1, 1)
 for nthreads in [1, 2, 3, 4]:
     print '== nthreads=%d' % nthreads
     for i, (size, nrepeat) in enumerate(zip(sizes, nrepeats)):
-        a = np.ones(size)
-        trials = [benchmark_bandwidth(a, nthreads, nrepeat) for j in range(5)]
+        trials = [benchmark_bandwidth(size, nthreads, nrepeat) for j in range(5)]
         times[i] = time = np.min(trials)
         print 'size=%d, time=%e, repeats=%d' % (size, time, nrepeat)
 
