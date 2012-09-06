@@ -38,8 +38,8 @@ sse_transpose: sse_transpose.c Makefile
 arithmetic: arithmetic.f90 Makefile
 	gfortran -fopenmp -Wall -O3 -mtune=native -o arithmetic arithmetic.f90
 
-liblookatme.so:
-	gcc -shared -o liblookatme.so lookatme.c
+liblookatme.so: lookatme.c Makefile
+	gcc -shared -fPIC -o liblookatme.so lookatme.c
 
 pingpong: pingpong.c liblookatme.so Makefile
 	gcc -O3 -Wall -std=c99 -g -fopenmp -c -o pingpong.o pingpong.c
