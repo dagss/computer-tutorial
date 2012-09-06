@@ -39,7 +39,7 @@ program transpose_runner
   use omp_lib
   implicit none
 
-  integer, parameter :: n = 8192, nrepeat = 5
+  integer, parameter :: n = 8192, nrepeat = 3
   real(8) :: t0, dt_naive, dt_tiled
   real(8), dimension(nrepeat) :: timings
   real(8), dimension(:, :), allocatable :: input, output
