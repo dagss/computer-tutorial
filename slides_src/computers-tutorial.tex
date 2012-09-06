@@ -119,7 +119,7 @@
     \uncover<+->{{\tt p = malloc(40);} & \quad\quad Allocate space for 10 integers (``array'') \\
      {\tt } & \quad\quad Memory of ``x'' contains 0x00007fffa63cc4b0 \\}
     \uncover<+->{{\tt int32\_t *u;} & \quad\quad  \\}
-    \uncover<+->{{\tt u = \&p + 1;} & \quad\quad Memory of ``u'' contains 0x00007fffa63cc4b4   \\}
+    \uncover<+->{{\tt u = p + 1;} & \quad\quad Memory of ``u'' contains 0x00007fffa63cc4b4   \\}
     \uncover<+->{{\tt *p = 10;} & \quad\quad Assign first element of array   \\}
     \uncover<+->{{\tt *u = 20;} & \quad\quad Assign second element of array   \\ & \\}
 
@@ -292,13 +292,17 @@ sized data sets}
 \end{frame}
 
 \begin{frame}
-Demo programs:
+Experiments exploring memory bus, cache, cache lines:
 \begin{enumerate}
-\item Memory bandwidth
-\item Memory latency
-\item Transpose
-\item OpenMP cache line ping-pong
+\item<+-> Memory bandwidth
+\item<+-> Memory latency
+\item<+-> Matrix transpose
+\item<+-> OpenMP cache-line ping-pong
 \end{enumerate}
+\end{frame}
+
+\begin{frame}{Matrix multiplication (Goto \& van de Geijn, 2008)}
+\includegraphics[width=\textwidth]{goto_matmul.png}  
 \end{frame}
 
 \begin{frame}
@@ -324,5 +328,93 @@ Demo programs:
   \end{center}
 \end{frame}
 
+\begin{frame}[fragile]{Out-of-order execution \& register renaming}
+  \begin{tikzpicture}
+    \node[text width=8cm]{
+\begin{verbatim}
+mov    eax, [rsp]
+imul   eax, eax
+mov    [rsp], eax
+mov    eax, [rsp+0x4]
+imul   eax, eax
+mov    [rsp+0x4], eax
+\end{verbatim}
+
+will execute more similar to:
+
+\begin{verbatim}
+mov    eax0, [rsp]
+mov    eax1, [rsp+0x4]
+imul   eax0, eax0
+imul   eax1, eax1
+mov    [rsp], eax0
+mov    [rsp+0x4], eax1
+\end{verbatim}
+
+    };
+    \node at (4, 0) {
+      \includegraphics[width=0.6\textwidth]{nehalem_arch.pdf}
+    };
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]{Pipelining}
+  \begin{tikzpicture}
+    \node[text width=8cm]{
+Not so good:
+{\small
+\begin{verbatim}
+for (i = 2; i < n; ++i) {
+    out[i] = a[i] * out[i - 2] + b[i] * out[i - 1];
+}
+\end{verbatim}
+}
+
+~
+
+Good:
+{\small
+\begin{verbatim}
+for (i = 0; i < n; ++i) {
+    out[i] = a[i] + b[i];
+}
+\end{verbatim}
+}
+    };
+    \node at (4.5, -3) {
+      \includegraphics[width=0.7\textwidth]{nehalem_arch_crop.pdf}
+    };
+  \end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}[fragile]{Branch prediction \& speculative execution}
+  \begin{tikzpicture}
+    \node[text width=8cm]{
+\begin{verbatim}
+x = f(y);
+if (x < 100) {
+    x *= 2;
+} else {
+   x -= 100;
+}
+\end{verbatim}
+    };
+    \node at (4.5, -3) {
+      \includegraphics[width=0.6\textwidth]{nehalem_arch.pdf}
+    };
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Vector instructions}
+  \begin{itemize}
+  \item SSE: 128-bit registers (4 $\times$ SP or 2 $\times$ DP)
+  \item AVX: 256-bit registers (8 $\times$ SP or 4 $\times$ DP)
+  \end{itemize}
+
+~
+
+\includegraphics[width=.6\textwidth]{sse.jpg} 
+\end{frame}
 
 \end{document}

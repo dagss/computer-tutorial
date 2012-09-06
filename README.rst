@@ -40,5 +40,8 @@ Show assembly code:
 Resources
 ---------
 
+Goto & van de Geijn, Anatomy of matrix multiplication:
+    http://dl.acm.org/citation.cfm?id=1356053
+
 Documentation on low-level optimization:
     http://agner.org/optimize/
