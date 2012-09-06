@@ -5,8 +5,8 @@
 #include "lookatme.h"
 
 #define CACHELINESIZE 64
-#define N (50 * 1000 * 1000)
-#define NSAMPLES 30
+#define N (100 * 1000 * 1000)
+#define NSAMPLES 10
 
 int main() {
 
