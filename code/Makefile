@@ -26,7 +26,8 @@ memory_benchmarks: memory_benchmarks.c memory_benchmarks_wrapper.pyx
 	gcc $(PYCFLAGS) $(PYINCLUDES) -c -o memory_benchmarks_wrapper.o \
 	  memory_benchmarks_wrapper.c
 	gcc -shared $(PYLDFLAGS) -o memory_benchmarks_wrapper.so \
-          memory_benchmarks_wrapper.o memory_benchmarks.o $(PYLIBS)
+          memory_benchmarks_wrapper.o memory_benchmarks.o $(PYLIBS) \
+          -Wl,-R. -L. -llookatme
 
 transpose: transpose.f90 Makefile
 	gfortran -fopenmp -Wall -O3 -mtune=native -o transpose transpose.f90

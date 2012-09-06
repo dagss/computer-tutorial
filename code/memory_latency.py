@@ -9,7 +9,7 @@ from memory_benchmarks_wrapper import benchmark_latency
 
 ks = np.arange(8, 26)
 ns = 2**ks
-nrepeats = 2**(ks[-1] - ks)
+nrepeats = 2**(ks[-1] + 2 - ks)
 times = np.zeros(len(ks), dtype=np.float64)
 
 fig, ax = plt.subplots(1, 1)
@@ -18,8 +18,7 @@ fig, ax = plt.subplots(1, 1)
 print '== Linear'
 for i, (n, nrepeat) in enumerate(zip(ns, nrepeats)):
     indices = np.arange(n, dtype=np.uint64) + 1
-    trials = [benchmark_latency(indices, nrepeat) for j in range(3)]
-    times[i] = time = np.min(trials)
+    times[i] = time = benchmark_latency(indices, nrepeat)
     print 'size=%d, time=%e, repeats=%d' % (n, time, nrepeat)
 
 ax.semilogx(ns, times / ns * 1e9, '-o', basex=2, label='Linear access')
@@ -28,8 +27,7 @@ ax.semilogx(ns, times / ns * 1e9, '-o', basex=2, label='Linear access')
 print '== Random'
 for i, (n, nrepeat) in enumerate(zip(ns, nrepeats)):
     indices = np.random.randint(n, size=n).astype(np.uint64)
-    trials = [benchmark_latency(indices, nrepeat) for j in range(3)]
-    times[i] = time = np.min(trials)
+    times[i] = time = benchmark_latency(indices, nrepeat)
     print 'size=%d, time=%e, repeats=%d' % (n, time, nrepeat)
     
 ax.semilogx(ns, times / ns * 1e9, '-o', basex=2, label='Random access')
