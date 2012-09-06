@@ -60,17 +60,24 @@
   \titlepage
 \end{frame}
 
-\begin{frame}{Memory, encoding and pointers}
+\begin{frame}
+
   \begin{center}
-  von Neumann architecture: CPU $\leftrightarrow$ memory bus $\leftrightarrow$ memory
-
-~
-
-    \includegraphics[width=0.7\textwidth]{SSEM.jpg}\\
-    Manchester Small-Scale Experimental Machine, world's first
-    stored-program computer (1948)
+    {\Large The world of the 50's to 90's:\\Central Processing Unit + Random Access Memory}
   \end{center}
 \end{frame}
+
+% \begin{frame}{Memory, encoding and pointers}
+%   \begin{center}
+%   von Neumann architecture: CPU $\leftrightarrow$ memory bus $\leftrightarrow$ memory
+
+% ~
+
+%     \includegraphics[width=0.7\textwidth]{SSEM.jpg}\\
+%     Manchester Small-Scale Experimental Machine, world's first
+%     stored-program computer (1948)
+%   \end{center}
+% \end{frame}
 
 \newcommand{\bs}[3]{{\color{blue}#1} \cdot {#2}^{#3} }
 \newcommand{\br}[3]{{\color{red}#1} \cdot {#2}^{#3} }
@@ -96,18 +103,120 @@
   Demo: {\tt binary.c}
 \end{frame}
 
-\begin{frame}{Pointers}
-
-TODO: Example in C of using pointers
-  
+\begin{frame}{Pointers (as seen in C)}
+  \begin{tabular}{lll}
+    \uncover<+->{{\tt int32\_t x;} & \quad\quad Declare a 4-byte integer ``x'' \\}
+    \uncover<+->{{\tt x = 42;} & \quad\quad Memory of ``x'' now contains 42 \\}
+    \uncover<+->{{\tt int32\_t *p;} & \quad\quad Declare an 8-byte {\bf pointer to int} ``p'' \\}
+    \uncover<+->{{\tt p = \&x;} & \quad\quad Memory of ``p'' now contains 0x00007fffa63cc4b0 \\}
+    \uncover<+->{{\tt *p = 10;} & \quad\quad Memory of ``x'' now contains 10 \\}
+  \end{tabular}
 \end{frame}
 
-\begin{frame}{Virtual memory}
-  \begin{tikzpicture}
-    \node at (0,0) {\includegraphics[width=.35\textwidth]{mmu.png}};
-    \node at (6,-2) {\includegraphics[width=.6\textwidth]{virtualmemory.pdf}};
-  \end{tikzpicture}
-{\tiny Illustrations from Wikipedia}
+\begin{frame}{Pointers and arrays...}
+  \begin{tabular}{lll}
+    \uncover<+->{{\tt int32\_t *p} & \quad\quad ``x'' is a pointer to integers \\}
+    \uncover<+->{{\tt p = malloc(40);} & \quad\quad Allocate space for 10 integers (``array'') \\
+     {\tt } & \quad\quad Memory of ``x'' contains 0x00007fffa63cc4b0 \\}
+    \uncover<+->{{\tt int32\_t *u;} & \quad\quad  \\}
+    \uncover<+->{{\tt u = \&p + 1;} & \quad\quad Memory of ``u'' contains 0x00007fffa63cc4b4   \\}
+    \uncover<+->{{\tt *p = 10;} & \quad\quad Assign first element of array   \\}
+    \uncover<+->{{\tt *u = 20;} & \quad\quad Assign second element of array   \\ & \\}
+
+    \uncover<+->{{\tt p[0] = 10;} & \quad\quad Same as {\tt *p = 10} \\ }
+    \uncover<+->{{\tt p[1] = 20;} & \quad\quad Same as {\tt *(p + 1) = 20} \\ }
+    \uncover<+->{{\tt p[10] = 30;} & \quad\quad Trampling on unallocated memory! \\ }
+  \end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]{Multi-dimensional arrays}
+\begin{verbatim}
+int32_t array = malloc(400);
+int32_t nrows = 5, ncols = 20;
+
+/* Treat memory in row-major ordering (C-order) */
+for (int32_t i = 0; i < nrows; i++) {
+  for (int32_t j = 0; j < ncols; j++) {
+    array[i * ncols + j] = some_function_of(i, j);
+  }
+}
+
+/* Treat memory in column-major ordering (Fortran-order) */
+for (int32_t i = 0; i < nrows; i++) {
+  for (int32_t j = 0; j < ncols; j++) {
+    array[i + j * nrows] = some_function_of(i, j);
+  }
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Other uses for pointers}
+Consider the Fortran routine:
+{\color{blue}\begin{verbatim}
+subroutine square_me(x)
+    integer(4) :: x
+    x = x * x
+end subroutine
+...
+call square_me(a) ! a is squared
+\end{verbatim}}
+
+~
+
+C is closer to hardware:
+{\color{blue}\begin{verbatim}
+void square_me(int32_t x) {
+    x = x * x;
+}
+...
+square_me(a); /* nothing happens */
+\end{verbatim}}
+
+\end{frame}
+
+\begin{frame}[fragile]{Other uses for pointers}
+Consider the Fortran routine:
+{\color{blue}\begin{verbatim}
+subroutine square_me(x)
+    integer(4) :: x
+    x = x * x
+end subroutine
+...
+call square_me(a) ! a is squared
+\end{verbatim}}
+
+~
+
+C is closer to hardware:
+{\color{blue}\begin{verbatim}
+void square_me(int32_t *p) {
+    int32_t x = *p;
+    *p = x * x;
+}
+...
+square_me(&a); /* a is squared */
+\end{verbatim}}
+
+\end{frame}
+
+
+\begin{frame}{Simple model of CPUs}
+  \begin{itemize}
+  \item<+-> {\bf Registers:} ``Hardware variables''. 
+    E.g., RAX/EAX, RBX/EAX, XMM0, \dots; about 32 registers on 64-bit
+    AMD/Intel CPUs
+  \item<+-> {\bf Instructions:} Stream of numbers telling the CPU
+    what to do.
+    \begin{tabular}{ll}
+
+      \uncover<+->{{\tt mov    eax, [rsp]} & \quad\quad Load from memory \\}
+      \uncover<+->{{\tt imul eax, eax} & \quad\quad Do something with register \\}
+      \uncover<+->{{\tt mov    [rsp], eax} & \quad\quad Store to memory \\}
+    \end{tabular}
+\end{itemize}
+
+\uncover<+->{Example: Disassemble {\tt add\_and\_square.o}}
+
 \end{frame}
 
 
@@ -135,33 +244,45 @@ TODO: Example in C of using pointers
 
 \end{frame}
 
-
-\begin{frame}{Simple model of CPU}
-  Loads, registers, etc.; some simple assembly
+\begin{frame}{Virtual memory}
+  \begin{tikzpicture}
+    \node at (0,0) {\includegraphics[width=.35\textwidth]{mmu.png}};
+    \node at (6,-2) {\includegraphics[width=.6\textwidth]{virtualmemory.pdf}};
+  \end{tikzpicture}
+{\tiny Illustrations from Wikipedia}
 \end{frame}
 
 
+\begin{frame}
+  
+  \begin{center}
+    \Large The memory bandwidth wall
+  \end{center}
+\end{frame}
 
 \begin{frame}{Benchmarking}
-\uncover<+->{Issues:}
 
 \begin{itemize}
-\item<+-> What speed is your CPU {\em really} running at?
+\item<+-> {\bf Problem:} What speed is your CPU {\em really} running at?
   \begin{enumerate}
   \item Power saving
   \item ``Turbo mode''
   \end{enumerate}
+\vspace{0.2cm}
+\uncover<+->{{\bf Solution:} Disable these features}
+\vspace{0.5cm}
 
-\item<+-> Interruptions from the OS
-\item<+-> Benchmark the CPU only, or the entire system?
-\end{itemize}
+\item<+-> {\bf Problem:} Interruptions from the OS\\
+\vspace{0.2cm}
+\uncover<+->{
+  {\bf Solution:} Take many samples of {\em wall time}, then use {\em minimum}. \\
+  For each sample, may have to repeat and average.
+}
+\vspace{0.5cm}
 
-\uncover<+->{One strategy (out of many):}
-\begin{itemize}
-%\item<+-> test
-\item<+-> Benchmark using all CPU cores
-\item<+-> Take many samples of {\em wall time}, then use {\em minimum}
-\item<+-> For each sample, may have to repeat and average
+\item<+-> {\bf Problem:} Does benchmark include memory bus etc. or just CPU? \\
+\uncover<+->{{\bf Solution:} Benchmark using all CPU cores and with realistically
+sized data sets}
 \end{itemize}
 
 \end{frame}
