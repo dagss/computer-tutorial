@@ -23,7 +23,7 @@
 %\usefonttheme{professionalfonts}
 %\setmathfont{}
 %\setsansfont{Palatino}
-\usetikzlibrary{arrows,backgrounds,positioning,fit,chains,shapes,calc}
+\usetikzlibrary{arrows,backgrounds,positioning,fit,chains,shapes,calc,matrix,decorations,decorations.pathreplacing}
 
 %\usepackage{handoutWithNotes}
 %\pgfpagesuselayout{4 on 1 with notes}[a4paper,border shrink=5mm]
@@ -60,10 +60,76 @@
   \titlepage
 \end{frame}
 
+
+\begin{frame}
+
+{\small Donald Knuth:}
+  \begin{tikzpicture}
+    \node[text width=8cm]{
+    \begin{quote}
+      Programmers waste enormous amounts of time thinking about, or
+      worrying about, the speed of noncritical parts of their
+      programs, and these attempts at efficiency actually have a
+      strong negative impact when debugging and maintenance are
+      considered. We should forget about small efficiencies, say about
+      97\% of the time: {\bf premature optimization is the root of all
+        evil}. Yet we should not pass up our opportunities in that
+      critical 3\%.
+    \end{quote}
+};
+    \node at (-5, 0) {\includegraphics[width=3cm]{knuth.jpg}};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{The law of leaky abstractions}
+{\small Joel Spolsky:}
+  \begin{tikzpicture}
+    \node[text width=7cm]{
+    \begin{quote}
+      {\bf All non-trivial abstractions, to some degree, are leaky.} [...]
+      Indeed, the
+      abstractions we've created over the years do allow us to deal
+      with new orders of complexity in software development that we
+      didn't have to deal with ten or fifteen years ago [...].
+      Suddenly one day we need to figure
+      out a problem where the abstraction leaked, and it takes 2
+      weeks.
+    \end{quote}
+};
+    \node at (-5, 0) {\includegraphics[width=4cm]{spolsky.jpg}};
+  \end{tikzpicture}
+
+
+~
+
+{\small http://www.joelonsoftware.com/articles/LeakyAbstractions.html}
+\end{frame}
+
+\begin{frame}{Past decades: Optimism}
+
+``Don't worry, better CPUs and compilers will take care of it''
+
+~
+
+{\includegraphics[width=0.8\textwidth]{transistors.pdf}};
+\end{frame}
+
+\begin{frame}{The reality}
+More complexity; algorithm must be adapted to hardware; compilers no magic bullet
+
+~
+
+  \begin{tikzpicture}
+    \uncover<+->{\node at (-2,0) {\includegraphics[width=0.8\textwidth]{clockspeeds.jpg}};}
+    \uncover<+->{\node at (0,-1) {\includegraphics[width=0.9\textwidth]{nvidiatesla.jpg}};}
+  \end{tikzpicture}
+  
+\end{frame}
+
 \begin{frame}
 
   \begin{center}
-    {\Large The world of the 50's to 90's:\\Central Processing Unit + Random Access Memory}
+    {\Large The basic abstractions for working with computers}
   \end{center}
 \end{frame}
 
@@ -96,7 +162,7 @@
               \only<2>{\br{1}{2}{3} + \br{1}{2}{2} + \br{0}{2}{1} + \br{0}{2}{0}}
               \\
 \uncover<2->{
- &= \bs{7}{16}{1} + \br{12}{16}{0} = \text{\tt 0x7c}}
+ &= \bs{7}{16}{1} + \br{12}{16}{0} = \text{\tt 0x{\color{blue}7}{\color{red}c}}}
   \end{align*}
 }
 
@@ -506,7 +572,16 @@ NERSC:
     \only<1>{\includegraphics[width=0.8\textwidth]{nehalem_front.jpg}}
     \only<2>{\includegraphics[width=0.8\textwidth]{nehalem_wafer.jpg}}
     \only<3>{\includegraphics[width=0.8\textwidth]{nehalem_callout.jpg}}
-    \only<4>{\includegraphics[width=0.6\textwidth]{nehalem_arch.pdf}}
+  \end{center}
+\end{frame}
+\begin{frame}
+  \begin{center}
+    \includegraphics[height=\textheight]{nehalem_arch.pdf}
+  \end{center}
+\end{frame}
+\begin{frame}
+  \begin{center}
+    \includegraphics[height=\textheight]{nehalem_arch_crop.pdf}
   \end{center}
 \end{frame}
 
@@ -581,6 +656,7 @@ if (x < 100) {
    x -= 100;
 }
 \end{verbatim}
+
     };
     \node at (4.5, -3) {
       \includegraphics[width=0.6\textwidth]{nehalem_arch.pdf}
@@ -597,7 +673,314 @@ if (x < 100) {
 ~
 
 \includegraphics[width=.6\textwidth]{sse.jpg} 
+
+~
+
+Experiment: {\tt sse\_transpose.c}
 \end{frame}
+
+\begin{frame}{Example}
+
+Legendre transform:
+\[
+q_{i} = \sum_{k = k_\mathrm{start}}^{k_\mathrm{stop}} \Lambda_{i,k} a_{k}
+\]
+
+
+\end{frame}
+
+\renewcommand{\P}{\widetilde{P}}
+\begin{frame}
+  \frametitle{The Legendre functions by recurrence relation}
+
+ \begin{equation*}
+    \begin{split}
+        \Lambda_{i,k+1} =& (x_i^2 + \alpha_{k}) \beta_{k} \Lambda_{i,k}
+        + \gamma_{k} \Lambda_{i,k-1}
+      \end{split}
+    \end{equation*}
+
+  \begin{center}
+    \begin{tikzpicture}
+      \node{
+      \only<1>{\includegraphics[width=.5\textwidth]{P3.pdf}}%
+      \only<2>{\includegraphics[width=.5\textwidth]{P4.pdf}}%
+      \only<3>{\includegraphics[width=.5\textwidth]{P5.pdf}}%
+      \only<4>{\includegraphics[width=.5\textwidth]{P6.pdf}}%
+      \only<5>{\includegraphics[width=.5\textwidth]{P7.pdf}}%
+      \only<6>{\includegraphics[width=.5\textwidth]{P8.pdf}}%
+      \only<7>{\includegraphics[width=.5\textwidth]{P9.pdf}}%
+      \only<8>{\includegraphics[width=.5\textwidth]{P10.pdf}}%
+      \only<9>{\includegraphics[width=.5\textwidth]{P11.pdf}}};
+
+%      \node[text width=5cm,anchor=west] at (3cm, 0) {
+%        \small
+%        We want to compute
+%        \[
+%        q_{i} = \sum_{k = k_\mathrm{start}}^{k_\mathrm{stop}} \Lambda_{i,k} a_{k}
+%        \]
+%      };
+    \end{tikzpicture}
+  \end{center}
+
+ 
+%E.g.,
+%{\footnotesize
+%\[\beta_{k} =
+%      \sqrt{\frac{(4k + 1)(4k +3)^2(4k + 5)} {(2k - m + 1)(2k - m +
+%          2)(2k + m + 1)(2k + m + 2)}}
+%\]
+%}
+\end{frame}
+
+\newcommand{\gridsize}{3mm}
+
+\begin{frame}
+  \frametitle{Legendre transform}
+  \begin{tikzpicture}[yscale=-1]
+
+    %
+    % Lambda
+    %
+    \node[fill=blue!20,minimum width=7cm,minimum height=7cm,anchor=north west] (Lambda) {
+    };
+
+    \draw (0,0) -- (7cm, 0cm) node[midway,anchor=south,outer sep=0,inner sep=.5mm] {\small $k$};
+    \draw (7cm,0cm) -- (7cm, 5cm) node[midway,anchor=west] {\small $i$};
+
+    \fill[blue!50] (0,30mm) rectangle (7cm,33mm);
+
+    \draw (Lambda.north west) grid[step=\gridsize] (Lambda.south east);
+    \coordinate (a) at (0,0);
+    \coordinate (ap) at (0,7);
+    \coordinate (b) at (3.9,0);
+    \coordinate (bp) at (3.9,7);
+    \coordinate (c) at (0,1.95);
+    \coordinate (cp) at (7,1.95);
+    \coordinate (d) at (0,4.05);
+    \coordinate (dp) at (7,4.05);
+
+    % \draw[fill=blue!40] ($(c)!(a)!(cp)$) rectangle ($(d)!(b)!(dp)$);
+    % \fill[fill=red!60!blue] ($(a)!(c)!(ap)$) rectangle ($(b)!(c)!(bp) - (0,3mm)$);
+    % \draw ($(c)!(a)!(cp) - (0,3mm)$) grid[step=\gridsize] ($(d)!(b)!(dp)$);
+
+    % \draw[thick,decorate,decoration={brace,amplitude=2mm}]
+    %    ($(b)!(c)!(bp)$) -- ($(b)!(d)!(bp)$)
+    %    node[fill=white,midway,anchor=west,inner sep=2pt, outer sep=6pt]{\footnotesize $B_k$};
+
+    % \draw[thick,decorate,decoration={brace,amplitude=2mm}]
+    %    ($(b)!(d)!(bp)$) -- ($(a)!(d)!(ap)$)
+    %    node[fill=white,midway,anchor=north,inner sep=2pt, outer sep=6pt]{
+    %      \footnotesize $B_i \times n_\mathrm{threads}$};
+
+    %\node[yscale=3,anchor=north]  {$\Big\}$};
+
+
+    %
+    % i-wise
+    %
+    
+    \node[fill=orange,minimum width=3mm,minimum height=7cm,anchor=north east,outer sep=0,%
+    inner sep=0,shift={(-9mm,0)}] (aux) at
+      ($(Lambda.north west)$) {};
+    \draw (aux.north west) grid[step=\gridsize] (aux.south east);
+
+    \fill[orange] (-12mm,30mm) rectangle (-9mm, 33mm);
+    
+    \node[draw,fill=red!60,minimum width=6mm,minimum height=7cm,anchor=north east,outer sep=0,%
+    inner sep=0,shift={(-3mm,0)}] (A) at
+      (Lambda.north west) {};
+
+    \fill[red] (-9mm,30mm) rectangle (-3mm, 33mm);
+    \draw[black] (A.north west) grid[step=\gridsize] (A.south east);
+
+    % k-wise
+    \node[fill=green,minimum width=7cm,minimum height=6mm,anchor=south west] (Q) at
+      ($(Lambda.north west) - (0,3mm)$) {};
+    \draw (Q.north west) grid[step=\gridsize] (Q.south east);
+
+    \coordinate (xsq-a) at ($(Lambda.north west) - (0,9mm) - (0, 6mm) - (0, 3mm)$);
+    \coordinate (xsq-b) at ($(xsq-a) + (7cm,0)$);
+    \coordinate (xsq-c) at ($(xsq-a) + (7cm,9mm)$);
+    \coordinate (xsq-d) at ($(xsq-a) + (0,9mm)$);
+    \fill[fill=orange,shift={(0,-10mm)}] (xsq-a) rectangle (xsq-c);
+
+    \draw[black] (xsq-a) grid[step=\gridsize] (xsq-c);
+
+
+    \node[thick,text width=8cm,fill=white,draw,inner sep=0mm,anchor=west] at (2cm,5cm) {
+      {
+\definecolor{darkyellow}{rgb}{.7,.2,0} 
+\definecolor{darkgreen}{rgb}{.0,.6,0.}
+       \small
+      \begin{align*}
+        {\color{blue} \Lambda_{i,k+1}} =& ({\color{darkyellow}x_i^2} + {\color{darkyellow}\alpha_{k}})
+        {\color{darkyellow}\beta_{k}}
+        {\color{blue}\Lambda_{i,k}}
+        + {\color{darkyellow}\gamma_{k}} {\color{blue}\Lambda_{i,k-1}}
+        \end{align*}
+        \[
+        {\color{red}q_{i,j}} = \sum_k {\color{blue}\Lambda_{i,k}} {\color{darkgreen}a_{k,j}}
+        \]
+        }
+
+
+    };
+
+  \end{tikzpicture}
+
+
+\end{frame}
+
+
+\newcommand{\QQ}[2]{\node (Q-#1-#2) {$q_{#1,#2}$};}
+\newcommand{\LL}[2]{\node (L-#1-#2) {$\Lambda_{#1,#2}$};}
+\renewcommand{\AA}[2]{\node (a-#1-#1) {$a_{#1,#1}$};}
+
+\begin{frame}
+  \frametitle{The SSE implementation}
+
+    \begin{equation*}\footnotesize
+        \Lambda_{i,k+1} = (x_i^2 + \alpha_{k}) \beta_{k}
+        \Lambda_{i,k} + \gamma_{k} \Lambda_{i,k-1}
+      \quad \quad \quad
+      q_{i,j} = \sum_k \Lambda_{i,k} a_{k,j}
+    \end{equation*}
+
+  \begin{tikzpicture}
+    \node[matrix,ampersand replacement=\&,left delimiter={[},%
+          right delimiter={]}] at (-5.1, 0) {
+      \QQ{12}{0} \& \QQ{12}{1} \\
+      \QQ{13}{0} \& \QQ{13}{1} \\
+      \QQ{14}{0} \& \QQ{14}{1} \\
+      \QQ{15}{0} \& \QQ{15}{1} \\
+      \QQ{16}{0} \& \QQ{16}{1} \\
+      \QQ{17}{0} \& \QQ{17}{1} \\
+    };
+    \begin{pgfonlayer}{background}
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-12-0.north west) { };
+      \only<2-3>{
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-14-0.north west) { };}
+    \only<3>{
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-16-0.north west) { };}
+
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-12-1.north west) { };
+      \only<2-3> {
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-14-1.north west) { };}
+    \only<3>{
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.75cm,fill=red!40] at (Q-16-1.north west) { };}
+
+    \end{pgfonlayer}
+
+    \node at (-3.4, 0) {{\tt +=}};
+
+    \node[matrix,ampersand replacement=\&,column sep=3mm] at (0, 3.5) {
+      \node (alpha-17) {$\alpha_{17}$}; \& 
+      \node (beta-17) {$\beta_{17}$}; \& 
+      \node (gamma-17) {$\gamma_{17}$}; \&[5mm]
+      \node (a-17-0) {$a_{17,0}$}; \& 
+      \node (a-17-1) {$a_{17,1}$}; \\
+      \node {$\alpha_{17}$}; \& 
+      \node {$\beta_{17}$}; \& 
+      \node {$\gamma_{17}$}; \& 
+      \node {$a_{17,0}$}; \& 
+      \node {$a_{17,1}$}; \\
+    };
+
+    \node[matrix,ampersand replacement=\&,column sep=3mm] at (4.6, 0) {
+      \node (x-12) {$x^2_{12}$}; \\
+      \node (x-13) {$x^2_{13}$}; \\
+      \node (x-14) {$x^2_{14}$}; \\
+      \node (x-15) {$x^2_{15}$}; \\
+      \node (x-16) {$x^2_{16}$}; \\
+      \node (x-17) {$x^2_{17}$}; \\
+    };
+
+
+    \begin{pgfonlayer}{background}
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.8cm,fill=yellow!40] at (alpha-17.north west) { };
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.9cm,fill=yellow!40] at (beta-17.north west) { };
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.8cm,fill=yellow!40] at (gamma-17.north west) { };
+
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.8cm,fill=green!40] at (a-17-0.north west) { };
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=.8cm,fill=green!40] at (a-17-1.north west) { };
+
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=1cm,fill=yellow!40] at (x-12.north west) { };
+    \only<2-3>{
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=1cm,fill=yellow!40] at (x-14.north west) { };}
+    \only<3>{
+      \node[anchor=north west,draw,text width=.67cm,text
+      height=1cm,fill=yellow!40] at (x-16.north west) { };}
+
+
+    \end{pgfonlayer}
+
+
+    \node[matrix,ampersand replacement=\&,left delimiter={[},%
+          right delimiter={]}] (A) at (.5, 0) {
+            \node{$\ddots$}; \& \node{$\vdots$}; \& \node{$\vdots$}; \& \node{$\vdots$};
+            \& \node[rotate=90]{$\ddots$}; \\
+            \node{$\cdots$}; \& \LL{12}{15} \& \LL{12}{16} \& \LL{12}{17} \&
+            \node{$\dots$}; \\
+            \node{$\cdots$}; \& \LL{13}{15} \& \LL{13}{16} \& \LL{13}{17} \&
+            \node{$\dots$}; \\
+            \node{$\cdots$}; \& \LL{14}{15} \& \LL{14}{16} \& \LL{14}{17} \&
+            \node{$\dots$}; \\
+            \node{$\cdots$}; \& \LL{15}{15} \& \LL{15}{16} \& \LL{15}{17} \&
+            \node{$\dots$}; \\
+            \node{$\cdots$}; \& \LL{16}{15} \& \LL{16}{16} \& \LL{16}{17} \&
+            \node{$\dots$}; \\
+            \node{$\cdots$}; \& \LL{17}{15} \& \LL{17}{16} \& \LL{17}{17} \&
+            \node{$\dots$}; \\
+            \node[rotate=90]{$\ddots$}; \& \node{$\vdots$}; \& \node{$\vdots$}; \& \node{$\vdots$};
+            \& \node{$\ddots$}; \\
+    };
+
+    \begin{pgfonlayer}{background}
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!20] at (L-12-15.north west) { };
+      \only<2-3>{
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!20] at (L-14-15.north west) { };}
+    \only<3>{
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!20] at (L-16-15.north west) { };}
+      
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!50] at (L-12-16.north west) { };
+      \only<2-3>{
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!50] at (L-14-16.north west) { };}
+    \only<3>{
+      \node[anchor=north west,draw,text width=.9cm,text
+      height=.9cm,fill=blue!50] at (L-16-16.north west) { };}
+
+    \end{pgfonlayer}
+
+    \node[draw,text width=2.5cm,fill=yellow!10] at (-5cm, 3.7cm) {
+      \only<1>{4.28 GFLOP/s (46\%)}%
+      \only<2>{5.69 GFLOP/s (62\%)}%
+      \only<3>{6.46 GFLOP/s (70\%)}%
+    };
+
+  \end{tikzpicture}
+\end{frame}
+
+
+
 
 
 \begin{frame}{CPUs have become complicated...what about GPUs?}
