@@ -4,9 +4,6 @@
 #include <omp.h>
 
 double benchmark_bandwidth_c(size_t n, int repeats, int nthreads, int pigs_can_fly) {
-  /* To avoid the compiler optimizing away the entire thing, we
-     accumulate the array in result.
-   */
   double dt;
   omp_set_num_threads(nthreads);
 #pragma omp parallel shared(dt)
