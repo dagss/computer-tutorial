@@ -21,4 +21,5 @@ code/pingpong
 *.nav
 *.out
 *.snm
+*.vrb
 slides_src/computers-tutorial.pdf
