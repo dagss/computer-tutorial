@@ -43,6 +43,9 @@ pingpong: pingpong.c liblookatme.so Makefile
 	gcc -O3 -Wall -std=c99 -g -fopenmp -c -o pingpong.o pingpong.c
 	gcc -fopenmp -o pingpong pingpong.o -Wl,-R. -L. -llookatme
 
+recursion: recursion.c
+	gcc -O0 -g -Wall -std=c99 -o recursion recursion.c
+
 clean:
 	rm -f *.o *.so binary knapsack
 
